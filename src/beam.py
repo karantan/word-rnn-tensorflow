@@ -1,4 +1,5 @@
-import tensorflow as tf
+"""."""
+
 import numpy as np
 
 
@@ -8,8 +9,8 @@ class BeamSearch():
 
         Args:
             predict:
-                A function that takes a `sample` and a `state`. It then performs
-                the computation on the last word in `sample`.
+                A function that takes a `sample` and a `state`. It then
+                performs the computation on the last word in `sample`.
             initial_state:
                 The initial state of the RNN.
             prime_labels:
@@ -74,20 +75,26 @@ class BeamSearch():
                 cand_scores[:, oov] = 1e20
             cand_flat = cand_scores.flatten()
 
-            # find the best (lowest) scores we have from all possible samples and new words
+            # find the best (lowest) scores we have from all possible samples
+            # and new words
             ranks_flat = cand_flat.argsort()[:(k - dead_k)]
             live_scores = cand_flat[ranks_flat]
 
             # append the new words to their appropriate live sample
             voc_size = probs.shape[1]
-            live_samples = [live_samples[r // voc_size] + [r % voc_size] for r in ranks_flat]
+            live_samples = [
+                live_samples[r // voc_size] + [r % voc_size]
+                for r in ranks_flat
+            ]
             live_states = [live_states[r // voc_size] for r in ranks_flat]
 
             # live samples that should be dead are...
-            zombie = [s[-1] == eos or len(s) >= maxsample for s in live_samples]
+            zombie = [
+                s[-1] == eos or len(s) >= maxsample for s in live_samples]
 
             # add zombies to the dead
-            dead_samples += [s for s, z in zip(live_samples, zombie) if z]  # remove first label == empty
+            # remove first label == empty
+            dead_samples += [s for s, z in zip(live_samples, zombie) if z]
             dead_scores += [s for s, z in zip(live_scores, zombie) if z]
             dead_states += [s for s, z in zip(live_states, zombie) if z]
             dead_k = len(dead_samples)
@@ -98,6 +105,7 @@ class BeamSearch():
             live_k = len(live_samples)
 
             # Finally, compute the next-step probabilities and states.
-            probs, live_states = self.predict_samples(live_samples, live_states)
+            probs, live_states = self.predict_samples(
+                live_samples, live_states)
 
         return dead_samples + live_samples, dead_scores + live_scores
