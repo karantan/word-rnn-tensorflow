@@ -1,7 +1,7 @@
 word-rnn-tensorflow
 ===================
 
-[![Build Status](https://travis-ci.org/hunkim/word-rnn-tensorflow.svg?branch=master)](https://travis-ci.org/hunkim/word-rnn-tensorflow)
+[![Build Status](https://travis-ci.org/karantan/word-rnn-tensorflow.svg?branch=master)](https://travis-ci.org/karantan/word-rnn-tensorflow)
 
 Multi-layer Recurrent Neural Networks (LSTM, RNN) for word-level language models in Python using TensorFlow.
 

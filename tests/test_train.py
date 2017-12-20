@@ -1,5 +1,5 @@
 import unittest
-from utils import TextLoader
+from src.utils import TextLoader
 import numpy as np
 
 class TestUtilsMethods(unittest.TestCase):

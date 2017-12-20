@@ -1,6 +1,6 @@
 import unittest
 
-from utils import TextLoader
+from src.utils import TextLoader
 
 
 class TestStringMethods(unittest.TestCase):

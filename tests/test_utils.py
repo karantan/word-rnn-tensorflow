@@ -1,5 +1,5 @@
 import unittest
-from utils import TextLoader
+from src.utils import TextLoader
 import numpy as np
 from collections import Counter
 

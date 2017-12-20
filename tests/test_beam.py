@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from beam import BeamSearch
+from src.beam import BeamSearch
 
 
 def naive_predict(sample, state):
