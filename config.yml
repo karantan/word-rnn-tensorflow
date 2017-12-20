@@ -1,0 +1,61 @@
+# train configuration
+train:
+    # data directory containing input.txt
+    data_dir: !!str data/tinyshakespeare
+
+    # character encoding of input.txt
+    # from https://docs.python.org/3/library/codecs.html#standard-encodings
+    input_encoding: null
+
+    # directory containing tensorboard logs
+    log_dir: !!str logs
+
+    # directory to store checkpointed models
+    save_dir: !!str save
+
+    # size of RNN hidden state
+    rnn_size: !!int 256
+
+    # number of layers in the RNN
+    num_layers: !!int 2
+
+    # rnn, gru, or lstm
+    model: !!str lstm
+
+    # minibatch size
+    batch_size: !!int 50
+
+    # RNN sequence length
+    seq_length: !!int 25
+
+    # number of epochs
+    num_epochs: !!int 50
+
+    # save frequency
+    save_every: !!int 1000
+
+    # clip gradients at this value
+    grad_clip: !!float 5
+
+    # learning rate
+    learning_rate: !!float 0.002
+
+    # decay rate for rmsprop
+    decay_rate: !!float 0.97
+
+    # % of gpu memory to be allocated to this process
+    gpu_mem: !!float 0.666
+
+    # continue training from saved model at this path. Path must contain files
+    # saved by previous training process:
+    #     'config.pkl'        : configuration;
+    #     'words_vocab.pkl'   : vocabulary definitions;
+    #     'checkpoint'        : paths to model file(s) (created by tf).
+    #                             Note: this file contains absolute paths,
+    #                             be careful when moving files around;
+    #     'model.ckpt-*'      : file(s) with model definition (created by tf)
+    init_from: null
+
+# run:
+#     text_file: data/low_calorie.text
+#     sequence_length: 50

@@ -3,6 +3,7 @@
 from beam import BeamSearch
 from tensorflow.contrib import legacy_seq2seq
 from tensorflow.contrib import rnn
+# from train import TrainConfiguration
 
 import numpy as np
 import random
@@ -10,7 +11,7 @@ import tensorflow as tf
 
 
 class Model:
-    def __init__(self, args, infer=False):
+    def __init__(self, args, vocab_size, infer=False):
         self.args = args
         if infer:
             args.batch_size = 1
@@ -23,7 +24,7 @@ class Model:
         elif args.model == 'lstm':
             cell_fn = rnn.BasicLSTMCell
         else:
-            raise Exception("model type not supported: {}".format(args.model))
+            raise Exception('model type not supported: {}'.format(args.model))
 
         cells = []
         for _ in range(args.num_layers):
@@ -38,12 +39,12 @@ class Model:
             tf.int32, [args.batch_size, args.seq_length])
         self.initial_state = cell.zero_state(args.batch_size, tf.float32)
         self.batch_pointer = tf.Variable(
-            0, name="batch_pointer", trainable=False, dtype=tf.int32)
+            0, name='batch_pointer', trainable=False, dtype=tf.int32)
         self.inc_batch_pointer_op = tf.assign(
             self.batch_pointer, self.batch_pointer + 1)
         self.epoch_pointer = tf.Variable(
-            0, name="epoch_pointer", trainable=False)
-        self.batch_time = tf.Variable(0.0, name="batch_time", trainable=False)
+            0, name='epoch_pointer', trainable=False)
+        self.batch_time = tf.Variable(0.0, name='batch_time', trainable=False)
         tf.summary.scalar("time_batch", self.batch_time)
 
         def variable_summaries(var):
@@ -60,13 +61,13 @@ class Model:
 
         with tf.variable_scope('rnnlm'):
             softmax_w = tf.get_variable(
-                'softmax_w', [args.rnn_size, args.vocab_size])
+                'softmax_w', [args.rnn_size, vocab_size])
             variable_summaries(softmax_w)
-            softmax_b = tf.get_variable('softmax_b', [args.vocab_size])
+            softmax_b = tf.get_variable('softmax_b', [vocab_size])
             variable_summaries(softmax_b)
             with tf.device('/cpu:0'):
                 embedding = tf.get_variable(
-                    'embedding', [args.vocab_size, args.rnn_size])
+                    'embedding', [vocab_size, args.rnn_size])
                 inputs = tf.split(tf.nn.embedding_lookup(
                     embedding, self.input_data), args.seq_length, 1)
                 inputs = [tf.squeeze(input_, [1]) for input_ in inputs]
@@ -90,7 +91,7 @@ class Model:
             [self.logits],
             [tf.reshape(self.targets, [-1])],
             [tf.ones([args.batch_size * args.seq_length])],
-            args.vocab_size,
+            vocab_size,
         )
         self.cost = tf.reduce_sum(loss) / args.batch_size / args.seq_length
         tf.summary.scalar('cost', self.cost)
