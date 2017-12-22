@@ -44,7 +44,7 @@ train:
 
     # continue training from saved model at this path. Path must contain files
     # saved by previous training process:
-    #     'config.pkl'        : configuration;
+    #     'config.pkl'        : configuration (`train.TrainConfiguration`);
     #     'words_vocab.pkl'   : vocabulary definitions;
     #     'checkpoint'        : paths to model file(s) (created by tf).
     #                             Note: this file contains absolute paths,

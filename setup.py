@@ -24,7 +24,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'click',
-        'h5py',
         'pyyaml',
         'tensorflow',
         'tqdm',

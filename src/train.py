@@ -1,9 +1,11 @@
 """."""
 
+from datetime import datetime
 from model import Model
 from six.moves import cPickle
 from utils import TextLoader
 
+import click
 import os
 import tensorflow as tf
 import time
@@ -78,6 +80,20 @@ class Train:
             gpu_mem=config['gpu_mem'],
             init_from=config['init_from'],
         )
+        self.create_save_folder()
+
+    def create_save_folder(self):
+        """Create a new save folder.
+
+        We want to save each run into specific folder.
+        """
+        model_folder = '{}-{}'.format(
+            os.path.split(self.config.data_dir)[-1],
+            datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+        )
+        self.config.save_dir = os.path.join(self.config.save_dir, model_folder)
+        if not os.path.exists(self.config.save_dir):
+            os.makedirs(self.config.save_dir)
 
     def run(self):
         data_loader = TextLoader(
@@ -132,7 +148,9 @@ class Train:
             assert saved_vocab == data_loader.vocab, (
                 'Data and loaded model disagree on dictionary mappings!')
 
-        with open(os.path.join(self.config.save_dir, 'config.pkl'), 'wb') as f:
+        with open(
+            os.path.join(self.config.save_dir, 'config.pkl'), 'wb'
+        ) as f:
             cPickle.dump(self.config, f)
         with open(
             os.path.join(self.config.save_dir, 'words_vocab.pkl'), 'wb'
@@ -212,7 +230,9 @@ class Train:
                         )
                     ):
                         checkpoint_path = os.path.join(
-                            self.config.save_dir, 'model.ckpt')
+                            self.config.save_dir,
+                            'model-{:.3f}.ckpt'.format(train_loss),
+                        )
                         saver.save(
                             sess,
                             checkpoint_path,
@@ -221,6 +241,15 @@ class Train:
                         print('model saved to {}'.format(checkpoint_path))
             train_writer.close()
 
-if __name__ == '__main__':
+
+@click.command()
+def cli():
+    """Train the model.
+
+    Configuration is located in the `config.yml` file.
+    """
     train = Train()
     train.run()
+
+if __name__ == '__main__':
+    cli()
