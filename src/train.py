@@ -1,6 +1,5 @@
 """."""
 
-from collections import namedtuple
 from model import Model
 from six.moves import cPickle
 from utils import TextLoader
@@ -11,27 +10,45 @@ import time
 import yaml
 
 
-TrainConfiguration = namedtuple(
-    'TrainConfiguration',
-    [
-        'data_dir',
-        'input_encoding',
-        'log_dir',
-        'save_dir',
-        'rnn_size',
-        'num_layers',
-        'model',
-        'batch_size',
-        'seq_length',
-        'num_epochs',
-        'save_every',
-        'grad_clip',
-        'learning_rate',
-        'decay_rate',
-        'gpu_mem',
-        'init_from',
-    ],
-)
+class TrainConfiguration:
+    """."""
+    def __init__(
+        self,
+        data_dir,
+        input_encoding,
+        log_dir,
+        save_dir,
+        rnn_size,
+        num_layers,
+        model,
+        batch_size,
+        seq_length,
+        num_epochs,
+        save_every,
+        grad_clip,
+        learning_rate,
+        decay_rate,
+        gpu_mem,
+        init_from,
+        vocab_size=None
+    ):
+        self.data_dir = data_dir
+        self.input_encoding = input_encoding
+        self.log_dir = log_dir
+        self.save_dir = save_dir
+        self.rnn_size = rnn_size
+        self.num_layers = num_layers
+        self.model = model
+        self.batch_size = batch_size
+        self.seq_length = seq_length
+        self.num_epochs = num_epochs
+        self.save_every = save_every
+        self.grad_clip = grad_clip
+        self.learning_rate = learning_rate
+        self.decay_rate = decay_rate
+        self.gpu_mem = gpu_mem
+        self.init_from = init_from
+        self.vocab_size = vocab_size
 
 
 class Train:
@@ -61,7 +78,6 @@ class Train:
             gpu_mem=config['gpu_mem'],
             init_from=config['init_from'],
         )
-        self.vocab_size = None
 
     def run(self):
         data_loader = TextLoader(
@@ -70,7 +86,7 @@ class Train:
             self.config.seq_length,
             self.config.input_encoding,
         )
-        self.vocab_size = data_loader.vocab_size
+        self.config.vocab_size = data_loader.vocab_size
 
         # check compatibility if training is continued from previously
         # saved model
@@ -117,13 +133,13 @@ class Train:
                 'Data and loaded model disagree on dictionary mappings!')
 
         with open(os.path.join(self.config.save_dir, 'config.pkl'), 'wb') as f:
-            cPickle.dump(self, f)
+            cPickle.dump(self.config, f)
         with open(
             os.path.join(self.config.save_dir, 'words_vocab.pkl'), 'wb'
         ) as f:
             cPickle.dump((data_loader.words, data_loader.vocab), f)
 
-        model = Model(self.config, self.vocab_size)
+        model = Model(self.config)
 
         merged = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(self.config.log_dir)

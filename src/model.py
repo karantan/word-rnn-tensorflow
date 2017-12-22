@@ -11,7 +11,7 @@ import tensorflow as tf
 
 
 class Model:
-    def __init__(self, args, vocab_size, infer=False):
+    def __init__(self, args, infer=False):
         self.args = args
         if infer:
             args.batch_size = 1
@@ -61,13 +61,13 @@ class Model:
 
         with tf.variable_scope('rnnlm'):
             softmax_w = tf.get_variable(
-                'softmax_w', [args.rnn_size, vocab_size])
+                'softmax_w', [args.rnn_size, args.vocab_size])
             variable_summaries(softmax_w)
-            softmax_b = tf.get_variable('softmax_b', [vocab_size])
+            softmax_b = tf.get_variable('softmax_b', [args.vocab_size])
             variable_summaries(softmax_b)
             with tf.device('/cpu:0'):
                 embedding = tf.get_variable(
-                    'embedding', [vocab_size, args.rnn_size])
+                    'embedding', [args.vocab_size, args.rnn_size])
                 inputs = tf.split(tf.nn.embedding_lookup(
                     embedding, self.input_data), args.seq_length, 1)
                 inputs = [tf.squeeze(input_, [1]) for input_ in inputs]
@@ -91,7 +91,7 @@ class Model:
             [self.logits],
             [tf.reshape(self.targets, [-1])],
             [tf.ones([args.batch_size * args.seq_length])],
-            vocab_size,
+            args.vocab_size,
         )
         self.cost = tf.reduce_sum(loss) / args.batch_size / args.seq_length
         tf.summary.scalar('cost', self.cost)

@@ -29,6 +29,11 @@ setup(
         'tensorflow',
         'tqdm',
     ],
+    extras_require={
+        'dev': [
+            'pdbpp',
+        ],
+    },
     # entry_points={
     #     'console_scripts': [
     #         'charmodel-train=train:train',

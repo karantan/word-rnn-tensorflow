@@ -34,6 +34,14 @@ pip install -e .
 
 ```
 
+For installing development dependencies type:
+
+```bash
+pip install -e .[dev]
+
+```
+
+
 Train the model
 ---------------
 
